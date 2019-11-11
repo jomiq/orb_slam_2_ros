@@ -133,7 +133,7 @@ tf::Transform Node::TransformFromMat (cv::Mat position_mat) {
 
   return tf::Transform (tf_camera_rotation, tf_camera_translation);
 }
-
+/*
 
 sensor_msgs::PointCloud2 Node::MapPointsToPointCloud (std::vector<ORB_SLAM2::MapPoint*> map_points) {
   if (map_points.size() == 0) {
@@ -179,8 +179,55 @@ sensor_msgs::PointCloud2 Node::MapPointsToPointCloud (std::vector<ORB_SLAM2::Map
   }
 
   return cloud;
-}
+} */
 
+sensor_msgs::PointCloud2 Node::MapPointsToPointCloud (std::vector<ORB_SLAM2::MapPoint*> map_points) {
+  if (map_points.size() == 0) {
+    std::cout << "Map point vector is empty!" << std::endl;
+  }
+
+  sensor_msgs::PointCloud2 cloud;
+
+  const int num_channels = 4; // x y z N
+
+  cloud.header.stamp = current_frame_time_;
+  cloud.header.frame_id = map_frame_id_param_;
+  cloud.height = 1;
+  cloud.width = map_points.size();
+  cloud.is_bigendian = false;
+  cloud.is_dense = true;
+  cloud.point_step = num_channels * sizeof(float);
+  cloud.row_step = cloud.point_step * cloud.width;
+  cloud.fields.resize(num_channels);
+
+  std::string channel_id[] = { "x", "y", "z", "c"};
+  for (int i = 0; i<num_channels; i++) {
+  	cloud.fields[i].name = channel_id[i];
+  	cloud.fields[i].offset = i * sizeof(float);
+  	cloud.fields[i].count = 1;
+  	cloud.fields[i].datatype = sensor_msgs::PointField::FLOAT32;
+  }
+
+  cloud.data.resize(cloud.row_step * cloud.height);
+
+	unsigned char *cloud_data_ptr = &(cloud.data[0]);
+
+  float data_array[num_channels];
+  for (unsigned int i=0; i<cloud.width; i++) {
+    if (map_points.at(i)->nObs >= min_observations_per_point_) {
+      data_array[0] = map_points.at(i)->GetWorldPos().at<float> (2); //x. Do the transformation by just reading at the position of z instead of x
+      data_array[1] = -1.0* map_points.at(i)->GetWorldPos().at<float> (0); //y. Do the transformation by just reading at the position of x instead of y
+      data_array[2] = -1.0* map_points.at(i)->GetWorldPos().at<float> (1); //z. Do the transformation by just reading at the position of y instead of z
+      data_array[3] = (float) 0.01* map_points.at(i)->nObs; // Add debug data
+      
+      //TODO dont hack the transformation but have a central conversion function for MapPointsToPointCloud and TransformFromMat
+
+      memcpy(cloud_data_ptr+(i*cloud.point_step), data_array, num_channels*sizeof(float));
+    }
+  }
+
+  return cloud;
+}
 
 void Node::ParamsChangedCallback(orb_slam2_ros::dynamic_reconfigureConfig &config, uint32_t level) {
   orb_slam_->EnableLocalizationOnly (config.localize_only);

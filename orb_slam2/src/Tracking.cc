@@ -1577,4 +1577,4 @@ void Tracking::InformOnlyTracking(const bool &flag)
 
 
 
-} //namespace ORB_SLAM
+} //namespace ORB_SLAM2
