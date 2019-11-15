@@ -133,7 +133,7 @@ tf::Transform Node::TransformFromMat (cv::Mat position_mat) {
 
   return tf::Transform (tf_camera_rotation, tf_camera_translation);
 }
-/*
+
 
 sensor_msgs::PointCloud2 Node::MapPointsToPointCloud (std::vector<ORB_SLAM2::MapPoint*> map_points) {
   if (map_points.size() == 0) {
@@ -179,8 +179,9 @@ sensor_msgs::PointCloud2 Node::MapPointsToPointCloud (std::vector<ORB_SLAM2::Map
   }
 
   return cloud;
-} */
-
+}
+/*
+// Alternate point cloud definition including observation count channel:
 sensor_msgs::PointCloud2 Node::MapPointsToPointCloud (std::vector<ORB_SLAM2::MapPoint*> map_points) {
   if (map_points.size() == 0) {
     std::cout << "Map point vector is empty!" << std::endl;
@@ -228,6 +229,7 @@ sensor_msgs::PointCloud2 Node::MapPointsToPointCloud (std::vector<ORB_SLAM2::Map
 
   return cloud;
 }
+*/
 
 void Node::ParamsChangedCallback(orb_slam2_ros::dynamic_reconfigureConfig &config, uint32_t level) {
   orb_slam_->EnableLocalizationOnly (config.localize_only);

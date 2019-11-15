@@ -1,0 +1,32 @@
+<launch>
+
+  <node name="orb_slam2_mono" pkg="orb_slam2_ros"
+      type="orb_slam2_ros_mono" output="screen">
+
+       <remap from="/camera/image_raw" to="/camera/image/image_raw" />
+
+       <param name="publish_pointcloud" type="bool" value="true" />
+       <param name="publish_pose" type="bool" value="true" />
+       <param name="localize_only" type="bool" value="false" />
+       <param name="reset_map" type="bool" value="false" />
+
+       <!-- static parameters -->
+       <param name="load_map" type="bool" value="true" />
+       <param name="map_file" type="string" value="lib.bin" />
+       <param name="settings_file" type="string" value="$(find orb_slam2_ros)/orb_slam2/config/tello_cam_mono.yaml" />
+       <param name="voc_file" type="string" value="$(find orb_slam2_ros)/orb_slam2/Vocabulary/ORBvoc.txt" />
+
+       <param name="pointcloud_frame_id" type="string" value="map" />
+       <param name="camera_frame_id" type="string" value="camera_link" />
+       <param name="min_num_kf_in_map" type="int" value="5" />
+  </node>
+
+    <node name="joy_node" pkg="joy" type="joy_node">
+        <param name="dev" value="/dev/input/js0" />
+    </node>
+
+    <node name="tello_driver" pkg="tello_driver" type="tello_driver.py" output="screen"/>
+    <param name="command_description" value="$(find tello_driver)/cfg/commands.yaml"/>
+    <param name="camera_info" value="$(find tello_driver)/cfg/camera_info.txt"/>
+
+</launch>
