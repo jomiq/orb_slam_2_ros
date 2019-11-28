@@ -88,6 +88,6 @@ private:
     void serialize(Archive &ar, const unsigned int version);
 };
 
-} //namespace ORB_SLAM
+} //namespace ORB_SLAM2
 
 #endif // MAP_H

@@ -101,6 +101,6 @@ protected:
     bool mbCheckOrientation;
 };
 
-}// namespace ORB_SLAM
+}// namespace ORB_SLAM2
 
 #endif // ORBMATCHER_H
